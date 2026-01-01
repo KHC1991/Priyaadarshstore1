@@ -1,0 +1,8 @@
+{
+  "name": "Priyaadarsh Store",
+  "description": "A premium affiliate and financial services platform with integrated tasks and investment plans.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

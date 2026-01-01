@@ -9,12 +9,10 @@ import {
   Smartphone, 
   ChevronRight, 
   UserPlus,
-  Sparkles,
   CheckCircle,
-  Mail,
-  BadgeCheck,
   AlertCircle,
-  Loader2
+  Loader2,
+  BadgeCheck
 } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 
@@ -51,7 +49,6 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
     if (ref && mode === 'register') {
       setFormData(prev => ({ ...prev, referralId: ref.toUpperCase() }));
     }
-    // Clear error when switching modes
     setError(null);
   }, [location, mode]);
 
@@ -97,18 +94,16 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
 
     setIsSubmitting(true);
 
-    // Simulate Network Delay
     setTimeout(() => {
+      const input = formData.email.toUpperCase();
+      
       if (mode === 'register') {
         const generatedId = 'PRIYA' + Math.floor(100000 + Math.random() * 900000);
         setTempUserId(generatedId);
         setIsSubmitting(false);
         setShowSuccess(true);
       } else {
-        const input = formData.email.toUpperCase();
-        
-        // --- ADMIN LOGIN LOGIC ---
-        // User ID: ADMIN, Password: 1234
+        // --- STRICT ADMIN LOGIN ---
         if (input === 'ADMIN' && formData.password === '1234') {
           onAuth({
             id: 'ADMIN',
@@ -119,12 +114,13 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
             balance: 50000,
             coins: 100000,
             isLoggedIn: true,
-            activeInvestments: []
+            activeInvestments: [],
+            loginPassword: '1234',
+            transactionPin: '1234'
           });
           setIsSubmitting(false);
           navigate('/dashboard');
         } 
-        // Logic for PRIYA IDs (starts with PRIYA and password length >= 4)
         else if (input.startsWith('PRIYA') && formData.password.length >= 4) {
           onAuth({
             id: input,
@@ -132,16 +128,18 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
             email: 'user@example.com',
             mobile: '9876543210',
             referralId: 'ADMIN',
-            balance: 0,
-            coins: 0,
+            balance: 10,
+            coins: 1000,
             isLoggedIn: true,
-            activeInvestments: []
+            activeInvestments: [],
+            loginPassword: formData.password,
+            transactionPin: '1234' // Default for session
           });
           setIsSubmitting(false);
           navigate('/dashboard');
         } else {
           setIsSubmitting(false);
-          setError("ખોટો ID અથવા પાસવર્ડ! (Admin માટે 'ADMIN' / '1234' વાપરો)");
+          setError("Invalid User ID or Password! Use ADMIN / 1234");
         }
       }
     }, 1200);
@@ -158,7 +156,9 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
       balance: 10,
       coins: 1000,
       isLoggedIn: true,
-      activeInvestments: []
+      activeInvestments: [],
+      loginPassword: formData.password,
+      transactionPin: formData.pin
     });
     navigate('/dashboard');
   };
@@ -174,32 +174,27 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-4 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-4 relative">
       <div className="absolute top-6 right-6 z-50">
         <LanguageSelector language={language} setLanguage={setLanguage} />
       </div>
       <Branding />
 
-      <div className="bg-white w-full max-w-[480px] rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white overflow-hidden animate-fadeIn">
+      <div className="bg-white w-full max-w-[480px] rounded-[3rem] shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
         <div className="p-8 md:p-10 space-y-7">
           <div className="flex items-center gap-4 border-b border-gray-50 pb-5">
             <div className={`${mode === 'register' ? 'bg-[#00008B]' : 'bg-blue-600'} p-3 rounded-2xl shadow-lg`}>
               {mode === 'register' ? <UserPlus className="text-white" size={24} /> : <Lock className="text-white" size={24} />}
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-gray-800 uppercase tracking-tight">
-                {mode === 'register' ? 'Create Account' : 'Member Login'}
-              </h2>
-              <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest">
-                {mode === 'register' ? 'Join our global network' : 'Enter your credentials'}
-              </p>
-            </div>
+            <h2 className="text-lg font-extrabold text-gray-800 uppercase tracking-tight">
+              {mode === 'register' ? 'Account Registration' : 'Member Login'}
+            </h2>
           </div>
 
           {error && (
             <div className="bg-red-50 text-red-600 p-4 rounded-2xl flex items-center gap-3 animate-shake">
               <AlertCircle size={18} />
-              <p className="text-xs font-bold uppercase tracking-tight">{error}</p>
+              <p className="text-xs font-bold uppercase">{error}</p>
             </div>
           )}
 
@@ -207,134 +202,71 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
             {mode === 'register' ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 ml-2 uppercase tracking-wider">Sponsor ID</label>
-                    <div className="relative">
-                      <input type="text" placeholder="Enter ID" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 pl-12 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-100 uppercase" value={formData.referralId} onChange={e => setFormData({...formData, referralId: e.target.value.toUpperCase()})} />
-                      <BadgeCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600" size={18} />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 ml-2 uppercase tracking-wider">Sponsor Name</label>
-                    <div className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 pl-12 h-[58px] flex items-center relative">
-                      <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                      <p className="text-xs font-bold text-gray-500 truncate">{sponsorName || '---'}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="text-blue-500" size={14} />
-                    <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Identity Info</span>
-                  </div>
                   <div className="relative">
-                    <input required type="text" placeholder="Your Full Name" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 pl-12 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <input type="text" placeholder="Sponsor ID" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 font-bold outline-none focus:ring-2 focus:ring-blue-100 uppercase" value={formData.referralId} onChange={e => setFormData({...formData, referralId: e.target.value})} />
+                    <BadgeCheck className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-500" size={16} />
                   </div>
-                  <div className="relative">
-                    <input required type="tel" placeholder="Mobile Number" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 pl-12 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
-                    <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Lock className="text-[#00008B]" size={14} />
-                    <span className="text-[10px] font-bold text-[#00008B] uppercase tracking-widest">Security</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input required type="password" placeholder="Pass" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium text-center outline-none focus:ring-2 focus:ring-blue-100" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-                    <input required type="password" placeholder="Confirm" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium text-center outline-none focus:ring-2 focus:ring-blue-100" value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
+                  <div className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[10px] font-bold text-gray-400 flex items-center truncate">
+                    {sponsorName || 'Sponsor Name'}
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="text-emerald-500" size={14} />
-                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Withdraw PIN</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input required type="password" maxLength={4} placeholder="PIN" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium text-center outline-none focus:ring-2 focus:ring-blue-100" value={formData.pin} onChange={e => setFormData({...formData, pin: e.target.value.replace(/\D/g, '')})} />
-                    <input required type="password" maxLength={4} placeholder="Confirm" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium text-center outline-none focus:ring-2 focus:ring-blue-100" value={formData.confirmPin} onChange={e => setFormData({...formData, confirmPin: e.target.value.replace(/\D/g, '')})} />
-                  </div>
+                <input required type="text" placeholder="Full Name" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                <input required type="tel" placeholder="Mobile Number" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
+                <div className="grid grid-cols-2 gap-4">
+                  <input required type="password" placeholder="Password" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                  <input required type="password" placeholder="Confirm Pass" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <input required type="password" maxLength={4} placeholder="4-Digit PIN" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.pin} onChange={e => setFormData({...formData, pin: e.target.value})} />
+                  <input required type="password" maxLength={4} placeholder="Confirm PIN" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-blue-100" value={formData.confirmPin} onChange={e => setFormData({...formData, confirmPin: e.target.value})} />
                 </div>
               </>
             ) : (
               <div className="space-y-6">
                 <div className="relative">
-                  <input required type="text" placeholder="User ID (ADMIN / PRIYA...)" className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 pl-14 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-100 uppercase" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                  <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-blue-600" size={22} />
+                  <input required type="text" placeholder="User ID (ADMIN / PRIYA...)" className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 pl-14 text-sm font-bold outline-none uppercase focus:ring-2 focus:ring-blue-100" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-blue-600" size={20} />
                 </div>
                 <div className="relative">
                   <input required type="password" placeholder="Password" className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 pl-14 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-100" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={22} />
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={20} />
                 </div>
               </div>
             )}
 
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className={`w-full ${mode === 'register' ? 'bg-gradient-to-r from-blue-900 to-blue-700' : 'bg-gradient-to-r from-blue-700 to-blue-500'} text-white font-black p-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] active:scale-95 transition-all text-sm flex items-center justify-center gap-3`}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin" size={20} />
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  {mode === 'register' ? 'Register Now' : 'Sign In Now'}
-                  <ChevronRight size={20} />
-                </>
-              )}
+            <button type="submit" disabled={isSubmitting} className="w-full bg-blue-900 text-white font-black p-5 rounded-2xl shadow-xl uppercase tracking-widest active:scale-95 transition-all text-sm flex items-center justify-center gap-3">
+              {isSubmitting ? <Loader2 className="animate-spin" /> : (mode === 'register' ? 'Create Account' : 'Sign In')}
+              <ChevronRight size={18} />
             </button>
           </form>
 
-          <div className="text-center pt-2">
-            <button 
-              onClick={() => { setError(null); navigate(mode === 'register' ? '/login' : '/register'); }} 
-              className="text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-blue-600 transition-colors"
-            >
-              {mode === 'register' ? "Already a member? " : "Don't have an account? "}
-              <span className="text-blue-600 ml-1 font-black underline">{mode === 'register' ? "Login" : "Register"}</span>
-            </button>
-          </div>
+          <button onClick={() => navigate(mode === 'register' ? '/login' : '/register')} className="w-full text-center text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-blue-600 transition-colors">
+            {mode === 'register' ? 'Already have an account? Login' : "Don't have an account? Register Now"}
+          </button>
         </div>
       </div>
 
       {showSuccess && (
-        <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-md flex items-center justify-center p-6 z-[2000] animate-fadeIn">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 z-[2000] animate-fadeIn">
           <div className="bg-white rounded-[3rem] w-full max-w-[400px] p-10 text-center space-y-8 shadow-2xl border-4 border-emerald-500/20">
-            <div className="flex justify-center">
-                <div className="bg-emerald-50 p-8 rounded-full shadow-inner animate-bounce">
-                    <CheckCircle size={64} className="text-emerald-500" />
-                </div>
-            </div>
+            <CheckCircle size={64} className="text-emerald-500 mx-auto animate-bounce" />
             <div className="space-y-2">
-              <h3 className="text-2xl font-black text-blue-900 uppercase tracking-tight">Success!</h3>
-              <p className="text-gray-400 font-bold text-[9px] uppercase tracking-widest">Your Permanent Account ID</p>
+              <h3 className="text-2xl font-black text-blue-900 uppercase">Success!</h3>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Account ID Generated</p>
             </div>
             <div className="bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-200">
               <p className="text-3xl font-black text-blue-900 font-mono tracking-widest">{tempUserId}</p>
             </div>
-            <p className="text-[10px] text-red-500 font-black uppercase italic leading-tight">
-              Please take a screenshot of this ID!<br/>You will need it to login.
-            </p>
-            <button onClick={handleFinalizeRegistration} className="w-full bg-blue-900 p-5 rounded-2xl text-white font-black text-sm uppercase tracking-widest shadow-xl transition-all active:scale-95">Launch Dashboard</button>
+            <p className="text-[10px] text-red-500 font-black uppercase italic leading-tight">Please take a screenshot of this ID!<br/>Use this to login.</p>
+            <button onClick={handleFinalizeRegistration} className="w-full bg-blue-900 p-5 rounded-2xl text-white font-black text-sm uppercase shadow-xl active:scale-95">Open Dashboard</button>
           </div>
         </div>
       )}
-
+      
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
       `}</style>
     </div>

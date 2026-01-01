@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Language, User } from '../types';
@@ -16,12 +17,14 @@ import {
   Loader2
 } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
+
 interface Props {
   mode: 'login' | 'register';
   language: Language;
   setLanguage: (lang: Language) => void;
   onAuth: (user: User) => void;
 }
+
 const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,13 +44,17 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
   const [tempUserId, setTempUserId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get('ref');
     if (ref && mode === 'register') {
       setFormData(prev => ({ ...prev, referralId: ref.toUpperCase() }));
     }
+    // Clear error when switching modes
+    setError(null);
   }, [location, mode]);
+
   useEffect(() => {
     const rid = formData.referralId.toLowerCase();
     if (rid === 'admin' || rid === 'demo') {
@@ -58,6 +65,7 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
       setSponsorName('');
     }
   }, [formData.referralId]);
+
   const validateForm = () => {
     if (mode === 'register') {
       if (!formData.name || !formData.mobile || !formData.password || !formData.pin) {
@@ -72,10 +80,6 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
         setError("ટ્રાન્ઝેક્શન પિન મેચ થતા નથી!");
         return false;
       }
-      if (formData.pin.length !== 4) {
-        setError("પિન 4 અંકનો હોવો જોઈએ!");
-        return false;
-      }
     } else {
       if (!formData.email || !formData.password) {
         setError("ID અને પાસવર્ડ નાખો!");
@@ -84,12 +88,15 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
     }
     return true;
   };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     
     if (!validateForm()) return;
+
     setIsSubmitting(true);
+
     // Simulate Network Delay
     setTimeout(() => {
       if (mode === 'register') {
@@ -99,7 +106,9 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
         setShowSuccess(true);
       } else {
         const input = formData.email.toUpperCase();
-        // ADMIN LOGIN LOGIC
+        
+        // --- ADMIN LOGIN LOGIC ---
+        // User ID: ADMIN, Password: 1234
         if (input === 'ADMIN' && formData.password === '1234') {
           onAuth({
             id: 'ADMIN',
@@ -107,14 +116,16 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
             email: 'admin@priyaadarsh.store',
             mobile: '8140003126',
             referralId: 'SYSTEM',
-            balance: 100000,
-            coins: 500000,
+            balance: 50000,
+            coins: 100000,
             isLoggedIn: true,
             activeInvestments: []
           });
           setIsSubmitting(false);
           navigate('/dashboard');
-        } else if ((input === 'DEMO' || input.startsWith('PRIYA')) && formData.password.length >= 4) {
+        } 
+        // Logic for PRIYA IDs (starts with PRIYA and password length >= 4)
+        else if (input.startsWith('PRIYA') && formData.password.length >= 4) {
           onAuth({
             id: input,
             name: 'Priyaadarsh User',
@@ -130,11 +141,12 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
           navigate('/dashboard');
         } else {
           setIsSubmitting(false);
-          setError("ખોટો ID અથવા પાસવર્ડ!");
+          setError("ખોટો ID અથવા પાસવર્ડ! (Admin માટે 'ADMIN' / '1234' વાપરો)");
         }
       }
     }, 1200);
   };
+
   const handleFinalizeRegistration = () => {
     setShowSuccess(false);
     onAuth({
@@ -143,13 +155,14 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
       email: formData.email,
       mobile: formData.mobile,
       referralId: formData.referralId,
-      balance: 0,
-      coins: 0,
+      balance: 10,
+      coins: 1000,
       isLoggedIn: true,
       activeInvestments: []
     });
     navigate('/dashboard');
   };
+
   const Branding = () => (
     <div className="text-center mb-6 animate-fadeIn">
       <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-2">
@@ -159,12 +172,14 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
       <p className="text-[10px] text-gray-400 font-bold tracking-[0.4em] uppercase mt-2 italic">Official Access Portal</p>
     </div>
   );
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-4 relative overflow-x-hidden">
       <div className="absolute top-6 right-6 z-50">
         <LanguageSelector language={language} setLanguage={setLanguage} />
       </div>
       <Branding />
+
       <div className="bg-white w-full max-w-[480px] rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white overflow-hidden animate-fadeIn">
         <div className="p-8 md:p-10 space-y-7">
           <div className="flex items-center gap-4 border-b border-gray-50 pb-5">
@@ -180,12 +195,14 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
               </p>
             </div>
           </div>
+
           {error && (
             <div className="bg-red-50 text-red-600 p-4 rounded-2xl flex items-center gap-3 animate-shake">
               <AlertCircle size={18} />
               <p className="text-xs font-bold uppercase tracking-tight">{error}</p>
             </div>
           )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {mode === 'register' ? (
               <>
@@ -220,6 +237,7 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
                     <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                   </div>
                 </div>
+
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Lock className="text-[#00008B]" size={14} />
@@ -230,6 +248,7 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
                     <input required type="password" placeholder="Confirm" className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-xs font-medium text-center outline-none focus:ring-2 focus:ring-blue-100" value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
                   </div>
                 </div>
+
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="text-emerald-500" size={14} />
@@ -244,7 +263,7 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
             ) : (
               <div className="space-y-6">
                 <div className="relative">
-                  <input required type="text" placeholder="User ID (Example: ADMIN)" className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 pl-14 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-100 uppercase" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <input required type="text" placeholder="User ID (ADMIN / PRIYA...)" className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 pl-14 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-100 uppercase" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                   <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-blue-600" size={22} />
                 </div>
                 <div className="relative">
@@ -253,10 +272,11 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
                 </div>
               </div>
             )}
+
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className={`w-full ${mode === 'register' ? 'bg-gradient-to-r from-blue-900 to-blue-700' : 'bg-gradient-to-r from-emerald-600 to-emerald-500'} text-white font-black p-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] active:scale-95 transition-all text-sm flex items-center justify-center gap-3`}
+              className={`w-full ${mode === 'register' ? 'bg-gradient-to-r from-blue-900 to-blue-700' : 'bg-gradient-to-r from-blue-700 to-blue-500'} text-white font-black p-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] active:scale-95 transition-all text-sm flex items-center justify-center gap-3`}
             >
               {isSubmitting ? (
                 <>
@@ -271,17 +291,19 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
               )}
             </button>
           </form>
+
           <div className="text-center pt-2">
             <button 
               onClick={() => { setError(null); navigate(mode === 'register' ? '/login' : '/register'); }} 
               className="text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-blue-600 transition-colors"
             >
-              {mode === 'register' ? "Already a member? " : "New to Priyaadarsh? "}
-              <span className="text-blue-600 ml-1 font-black">{mode === 'register' ? "Login" : "Register"}</span>
+              {mode === 'register' ? "Already a member? " : "Don't have an account? "}
+              <span className="text-blue-600 ml-1 font-black underline">{mode === 'register' ? "Login" : "Register"}</span>
             </button>
           </div>
         </div>
       </div>
+
       {showSuccess && (
         <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-md flex items-center justify-center p-6 z-[2000] animate-fadeIn">
           <div className="bg-white rounded-[3rem] w-full max-w-[400px] p-10 text-center space-y-8 shadow-2xl border-4 border-emerald-500/20">
@@ -304,6 +326,7 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
           </div>
         </div>
       )}
+
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
@@ -317,5 +340,6 @@ const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
     </div>
   );
 };
+
 export default Auth;
 

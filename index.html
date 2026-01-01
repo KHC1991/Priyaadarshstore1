@@ -1,45 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Priyaadarsh Store</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'priya-dark': '#00008B',
-                        'priya-light': '#ADD8E6',
-                    },
-                    animation: { 'blink': 'blink 1.5s linear infinite' },
-                    keyframes: {
-                        blink: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0 } }
-                    }
-                }
-            }
-        }
-    </script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Priya Adarsh Store</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; padding: 0; }
+      /* લોડિંગ વખતે બ્લેક સ્ક્રીન રોકવા માટે */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white !important; /* અહીં સફેદ કલર સેટ કર્યો */
+      }
+      #root {
+        background-color: white;
+      }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@7.0.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="./src/index.css">
-</head>
-<body class="bg-gray-50 text-priya-dark">
+  </head>
+  <body>
     <div id="root"></div>
-    <script type="module" src="./src/index.tsx"></script>
-</body>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

@@ -98,3 +98,4 @@ const Dashboard: React.FC<Props> = ({ user, setUser, language, setLanguage }) =>
 };
 
 export default Dashboard;
+

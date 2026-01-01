@@ -13,14 +13,9 @@
                         'priya-dark': '#00008B',
                         'priya-light': '#ADD8E6',
                     },
-                    animation: {
-                        'blink': 'blink 1.5s linear infinite',
-                    },
+                    animation: { 'blink': 'blink 1.5s linear infinite' },
                     keyframes: {
-                        blink: {
-                            '0%, 100%': { opacity: 1 },
-                            '50%': { opacity: 0 },
-                        }
+                        blink: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0 } }
                     }
                 }
             }
@@ -41,10 +36,10 @@
   }
 }
 </script>
-<link rel="stylesheet" href="src/index.css">
+<link rel="stylesheet" href="./src/index.css">
 </head>
 <body class="bg-gray-50 text-priya-dark">
     <div id="root"></div>
-    <script type="module" src="src/index.tsx"></script>
+    <script type="module" src="./src/index.tsx"></script>
 </body>
 </html>

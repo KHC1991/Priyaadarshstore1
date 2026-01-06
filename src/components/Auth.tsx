@@ -5,17 +5,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get } from "firebase/database";
 import { 
   Lock, 
-  ShieldCheck, 
   User as UserIcon, 
-  Smartphone, 
   ChevronRight, 
   UserPlus,
   CheckCircle,
   AlertCircle,
   Loader2,
   BadgeCheck
-} from 'lucide-react';
-import LanguageSelector from './LanguageSelector';
+} from 'lucide-center';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -29,97 +26,51 @@ const firebaseConfig = {
   measurementId: "G-WKJV7EBC61"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-interface Props {
-  mode: 'login' | 'register';
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  onAuth: (user: User) => void;
-}
-
-const Auth: React.FC<Props> = ({ mode, language, setLanguage, onAuth }) => {
+const Auth = ({ mode, language, setLanguage, onAuth }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    referralId: '', 
-    password: '',
-    confirmPassword: '',
-    pin: '',
-    confirmPin: '',
-  });
-  
-  const [sponsorName, setSponsorName] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [tempUserId, setTempUserId] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const ref = params.get('ref');
-    if (ref && mode === 'register') {
-      setFormData(prev => ({ ...prev, referralId: ref.toUpperCase() }));
-    }
-    setError(null);
-  }, [location, mode]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     setIsSubmitting(true);
+    setError(null);
 
     try {
-      // Realtime Database માંથી PIN ચેક કરવો
       const pinRef = ref(db, 'pin');
       const snapshot = await get(pinRef);
       
       if (snapshot.exists()) {
         const correctPin = snapshot.val().toString();
-        const inputPin = formData.password; // યુઝર જે પાસવર્ડ નાખે છે તે
-
-        if (inputPin === correctPin || (formData.email.toUpperCase() === 'ADMIN' && inputPin === '1234')) {
-          // લોગિન સફળ લોજિક
-          onAuth({
-            id: formData.email.toUpperCase() || 'USER',
-            name: 'Verified Member',
-            email: 'user@priyaadarsh.store',
-            mobile: formData.mobile || '0000000000',
-            referralId: 'SYSTEM',
-            balance: 10,
-            coins: 1000,
-            isLoggedIn: true,
-            activeInvestments: [],
-            loginPassword: inputPin,
-            transactionPin: correctPin
-          });
+        if (formData.password === correctPin || (formData.email.toUpperCase() === 'ADMIN' && formData.password === '1234')) {
+          onAuth({ id: 'ADMIN', name: 'Admin User', isLoggedIn: true });
           navigate('/dashboard');
         } else {
-          setError("Invalid PIN! ડેટાબેઝ સાથે મેચ થતો નથી.");
+          setError("Invalid PIN! સાચો પિન નાખો.");
         }
-      } else {
-        setError("Database PIN not found!");
       }
     } catch (err) {
-      setError("Connection Error! Rules ચેક કરો.");
+      setError("કનેક્શનમાં ભૂલ છે!");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ... બાકીનો ડિઝાઇન કોડ (Branding, Form UI વગેરે) તે જ રહેશે
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-4">
-       {/* અહીં તમારો બાકીનો Return કોડ આવશે જે તમે પહેલા મોકલ્યો હતો */}
-       <form onSubmit={handleSubmit}>
-          {/* Form Fields... */}
-          <button type="submit">Sign In</button>
-       </form>
+    <div className="flex flex-col items-center p-10">
+      <h2 className="text-2xl font-bold mb-5">Priya Adarsh Store Login</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input type="text" placeholder="User ID" className="border p-3 w-full rounded" onChange={(e) => setFormData({...formData, email: e.target.value})} />
+        <input type="password" placeholder="Enter PIN (8140)" className="border p-3 w-full rounded" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+        <button type="submit" className="bg-blue-900 text-white p-3 w-full rounded font-bold">
+          {isSubmitting ? 'Checking...' : 'Sign In'}
+        </button>
+      </form>
     </div>
   );
 };

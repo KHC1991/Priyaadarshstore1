@@ -76,4 +76,3 @@ const Auth = ({ mode, language, setLanguage, onAuth }) => {
 };
 
 export default Auth;
-

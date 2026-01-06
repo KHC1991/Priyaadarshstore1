@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +28,13 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #F8FAFC;
+        }
         .spin-wheel {
             transition: transform 3s cubic-bezier(0.2, 0, 0, 1);
         }
@@ -38,21 +43,22 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
-  }
-}
-</script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react-dom": "https://esm.sh/react-dom@^19.2.3"
+      }
+    }
+    </script>
 </head>
-<body class="bg-gray-50 text-priya-dark">
+<body>
     <div id="root"></div>
-    <!-- FIXED: Correct path to index.tsx, removing /src/ prefix -->
+    <!-- મુખ્ય એન્ટ્રી પોઈન્ટ: index.tsx -->
     <script type="module" src="index.tsx"></script>
 </body>
 </html>

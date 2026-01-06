@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Loader2,
   BadgeCheck
-} from 'lucide-center';
+} from 'lucide-react';
 
 // Firebase Configuration
 const firebaseConfig = {

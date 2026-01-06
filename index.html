@@ -29,12 +29,14 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; padding: 0; }
         .spin-wheel {
             transition: transform 3s cubic-bezier(0.2, 0, 0, 1);
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 <script type="importmap">
 {
@@ -50,7 +52,7 @@
 </head>
 <body class="bg-gray-50 text-priya-dark">
     <div id="root"></div>
-    <!-- FIXED: Correct path to the entry file -->
+    <!-- FIXED: Correct path to index.tsx, removing /src/ prefix -->
     <script type="module" src="index.tsx"></script>
 </body>
 </html>

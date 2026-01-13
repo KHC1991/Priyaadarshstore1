@@ -1,17 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 
-// આ વિગતો Firebase Console -> Project Settings માંથી મેળવો
+// આ વિગતો તમારા Firebase Console માંથી મેળવો
 const firebaseConfig = {
-  apiKey: "AIzaSy...", 
+  apiKey: "તમારી_API_KEY",
   authDomain: "priyaadarsh-store.firebaseapp.com",
   projectId: "priyaadarsh-store",
   storageBucket: "priyaadarsh-store.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
+  messagingSenderId: "તમારો_ID",
+  appId: "તમારો_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export const auth = getAuth(app);

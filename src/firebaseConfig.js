@@ -1,15 +1,11 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
-// આ વિગતો તમારા Firebase Console માંથી મેળવો
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "તમારી_API_KEY",
-  authDomain: "priyaadarsh-store.firebaseapp.com",
-  projectId: "priyaadarsh-store",
-  storageBucket: "priyaadarsh-store.appspot.com",
-  messagingSenderId: "તમારો_ID",
-  appId: "તમારો_APP_ID"
+  apiKey: "AIzaSyATwi1u2b5HL3w10pI7OGBUiSCKxsja-n0",
+  authDomain: "priyaadarshstore.firebaseapp.com",
+  databaseURL: "https://priyaadarshstore-default-rtdb.firebaseio.com",
+  projectId: "priyaadarshstore",
+  storageBucket: "priyaadarshstore.firebasestorage.app",
+  messagingSenderId: "711284532820",
+  appId: "1:711284532820:web:b24c14cb626161fe19afc1",
+  measurementId: "G-WKJV7EBC61"
 };
-
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
